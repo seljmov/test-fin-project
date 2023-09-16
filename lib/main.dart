@@ -1,15 +1,41 @@
 // ignore: unused_import
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
+import 'package:test_project/firebase_options.dart';
+import 'package:test_project/game_page.dart';
+import 'package:test_project/link_repository.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 // Import for Android features.
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 // Import for iOS features.
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  final remoteConfig = FirebaseRemoteConfig.instance;
+  await remoteConfig.setConfigSettings(RemoteConfigSettings(
+    fetchTimeout: const Duration(minutes: 1),
+    minimumFetchInterval: const Duration(hours: 1),
+  ));
+
+  final linkRepository = LinkRepository();
+  remoteConfig.onConfigUpdated.listen((event) async {
+    await remoteConfig.activate();
+
+    // Use the new config values here.
+    final link = remoteConfig.getString('link');
+    debugPrint('Link: $link');
+    await linkRepository.saveLink(link);
+  });
+
+  runApp(const GamePage());
 }
 
 class MyApp extends StatelessWidget {

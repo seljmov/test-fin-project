@@ -29,8 +29,12 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   cupertino_icons: ^1.0.2
+  firebase_analytics: ^10.4.5
+  firebase_core: ^2.15.1
+  firebase_remote_config: ^4.2.5
   flutter:
     sdk: flutter
+  shared_preferences: ^2.2.1
   webview_flutter: ^4.2.4
 
 dev_dependencies:
